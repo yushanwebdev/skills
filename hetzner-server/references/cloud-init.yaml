@@ -1,0 +1,17 @@
+#cloud-config
+# Base bootstrap for a Hetzner Ubuntu server. Keep it thin; edit for your stack.
+# The SSH-access steps live in references/harden-ssh.sh and are run by hand so
+# the new door can be proven before root is locked (see SKILL.md step 7 caveat).
+package_update: true
+package_upgrade: true
+
+packages:
+  - docker.io            # drop if your stack doesn't need Docker
+
+bootcmd:
+  - mkdir -p /usr/local/bin
+
+runcmd:
+  # Your stack: write files, `docker compose up`, install a systemd unit, ...
+  # Keep it idempotent — cloud-init can re-run.
+  - [ sh, -c, "date -u +%FT%TZ > /var/log/bootstrap.utc" ]
