@@ -22,10 +22,11 @@ On the machine you run this from; set up whatever's missing first.
 | Need | Check | If missing |
 |---|---|---|
 | `hcloud` CLI | `command -v hcloud` | `brew install hcloud`, or the release binary |
-| an SSH keypair | `ls ~/.ssh/<key>.pub` | `ssh-keygen -t ed25519 -f ~/.ssh/<key>` |
+| an SSH keypair | `ls ~/.ssh/*.pub`, or `ssh-add -l` lists one | `ssh-keygen -t ed25519 -f ~/.ssh/<key>`, or the 1Password agent — `references/1password.md` |
 
-Decide too: the **sudo username** and the **ports** your purpose needs. `ssh` and
-`scp` ship with the OS.
+Keys may live in files or in 1Password's SSH agent; every later step works either
+way. Decide too: the **sudo username** and the **ports** your purpose needs.
+`ssh` and `scp` ship with the OS.
 
 **Done when** both checks pass.
 
@@ -77,8 +78,9 @@ hcloud server create \
   --user-data-from-file references/cloud-init.yaml
 ```
 
-Use `--location` (datacenters are gone). `--ssh-key` names a key already
-registered (`hcloud ssh-key list`); it lands in root's `authorized_keys`.
+Use `--location` (datacenters are gone). `--ssh-key` takes a registered key name
+(`hcloud ssh-key list`); register one from your agent's public key if it lives in
+1Password — `references/1password.md`. It lands in root's `authorized_keys`.
 
 **Done when** `hcloud server list` shows the server `running` and
 `hcloud server ip <server>` returns an address.
@@ -136,3 +138,4 @@ break-glass in reach until you have logged in once and confirmed the user works.
 - `references/firewall.json` — rule example (bare array); add your ports.
 - `references/cloud-init.yaml` — bootstrap template.
 - `references/harden-ssh.sh` — `user` / `harden`, idempotent.
+- `references/1password.md` — the 1Password SSH agent as the key source.
