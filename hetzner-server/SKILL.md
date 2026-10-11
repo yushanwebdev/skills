@@ -15,14 +15,28 @@ One rule carries the whole guide, **prove-then-lock**: build the new door and
 prove it opens *before* you bolt the old one. Every lockout comes from locking
 first.
 
-Gather before step 1: an hcloud API token (project-scoped), a sudo username, the
-SSH public key to trust, and the ports your purpose needs.
+## 0. Prerequisites
+
+On the machine you run this from; set up whatever's missing first.
+
+| Need | Check | If missing |
+|---|---|---|
+| `hcloud` CLI | `command -v hcloud` | `brew install hcloud`, or the release binary |
+| an SSH keypair | `ls ~/.ssh/<key>.pub` | `ssh-keygen -t ed25519 -f ~/.ssh/<key>` |
+
+Decide too: the **sudo username** and the **ports** your purpose needs. `ssh` and
+`scp` ship with the OS.
+
+**Done when** both checks pass.
 
 ## 1. Auth
 
 ```sh
-hcloud context create <name>      # paste the project token at the prompt
+hcloud context create <name>      # paste a project-scoped token at the prompt
 ```
+
+The token must be **project-scoped** (project → Security → API tokens), not an
+account-wide one.
 
 **Done when** `hcloud server list` runs without an auth error.
 
