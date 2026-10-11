@@ -22,11 +22,11 @@ On the machine you run this from; set up whatever's missing first.
 | Need | Check | If missing |
 |---|---|---|
 | `hcloud` CLI | `command -v hcloud` | `brew install hcloud`, or the release binary |
-| an SSH keypair | `ls ~/.ssh/*.pub`, or `ssh-add -l` lists one | `ssh-keygen -t ed25519 -f ~/.ssh/<key>`, or the 1Password agent — `references/1password.md` |
+| 1Password SSH agent holding your key | `ssh-add -l` lists it | enable the agent — `references/1password.md` |
 
-Keys may live in files or in 1Password's SSH agent; every later step works either
-way. Decide too: the **sudo username** and the **ports** your purpose needs.
-`ssh` and `scp` ship with the OS.
+SSH keys come only from 1Password's SSH agent; this guide never writes or reads a
+key file on disk. Decide too: the **sudo username** and the **ports** your
+purpose needs. `ssh` and `scp` ship with the OS.
 
 **Done when** both checks pass.
 
@@ -78,9 +78,9 @@ hcloud server create \
   --user-data-from-file references/cloud-init.yaml
 ```
 
-Use `--location` (datacenters are gone). `--ssh-key` takes a registered key name
-(`hcloud ssh-key list`); register one from your agent's public key if it lives in
-1Password — `references/1password.md`. It lands in root's `authorized_keys`.
+Use `--location` (datacenters are gone). `--ssh-key` takes a registered key name;
+register one from the agent's public key (`ssh-add -L`) — `references/1password.md`.
+It lands in root's `authorized_keys`.
 
 **Done when** `hcloud server list` shows the server `running` and
 `hcloud server ip <server>` returns an address.

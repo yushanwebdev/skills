@@ -1,31 +1,35 @@
 # 1Password SSH keys
 
-1Password can be the SSH key store: private keys stay sealed in the vault, and its
-**SSH agent** exposes them to `ssh` and `scp`. Nothing lands in `~/.ssh`.
+SSH keys come only from 1Password's **SSH agent**: private keys stay sealed in the
+vault, and the agent exposes them to `ssh` and `scp`. No key file is written to
+`~/.ssh` — there is no on-disk fallback.
 
-## Wire the agent
+## Enable and wire the agent
 
-Turn it on in 1Password: **Settings → Developer → Use the SSH agent**.
-
-Point your shell at its socket so plain `ssh` uses it — add to `~/.zshrc`:
+1. 1Password app: **Settings → Developer → Use the SSH agent** (on). The key you
+   need must be an **SSH Key** item in a vault the app can unlock.
+2. Point the shell at its socket so plain `ssh`/`scp` use it — add to `~/.zshrc`:
 
 ```sh
 export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"  # macOS
 export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"                                          # Linux
 ```
 
-Or scope it to one call: `SSH_AUTH_SOCK=<socket> ssh …`.
+Without that export, prefix each call: `SSH_AUTH_SOCK=<socket> ssh …`.
 
-## See the keys
+## Confirm the key is visible
 
 ```sh
-ssh-add -l     # fingerprints + names, once the socket is set
+ssh-add -l     # fingerprints + names; must list the key you will inject
 ```
 
-## Register a public key with Hetzner
+Empty output means the agent is off, locked, or the key isn't an SSH Key item.
+Fix that before continuing — there is nothing to fall back to.
 
-`ssh-add -L` prints the public keys in `authorized_keys` form — no private key
-needed:
+## Register the public key with Hetzner
+
+`ssh-add -L` prints the public keys in `authorized_keys` form; the private key
+never leaves the vault:
 
 ```sh
 ssh-add -L                                    # copy the line you want
@@ -33,6 +37,5 @@ hcloud ssh-key create --name <n> --public-key "<paste>"
 hcloud ssh-key list                           # confirm
 ```
 
-Now the guide runs unchanged: `--ssh-key <n>` injects it, and `ssh root@<ip>`
-authenticates through the agent. If the agent is your default socket, no key
-file is involved anywhere.
+The rest of the guide runs as written: `--ssh-key <n>` injects that public key,
+and `ssh root@<ip>` / `scp` authenticate through the agent.
